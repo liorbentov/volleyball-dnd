@@ -41,6 +41,16 @@ const roleTarget = {
 	}
 };
 
+const startingLeft = width + 70;
+const initialRoles = {
+    S: { top: 0, left: startingLeft, title: 'S' },
+    OS: { top: 50, left: startingLeft, title: 'OS' },
+    A1: { top: 100, left: startingLeft, title: 'A1' },
+    A2: { top: 150, left: startingLeft, title: 'A2' },
+    C1: { top: 200, left: startingLeft, title: 'C1' },
+    C2: { top: 250, left: startingLeft, title: 'C2' }
+};
+
 class Court extends Component {
 	static propTypes = {
 		hideSourceOnDrag: PropTypes.bool,
@@ -50,17 +60,11 @@ class Court extends Component {
 	constructor(props) {
 		super(props);
 
-		const startingLeft = width + 70;
 		this.state = {
-			roles: {
-				S: { top: 0, left: startingLeft, title: 'S' },
-				OS: { top: 50, left: startingLeft, title: 'OS' },
-				A1: { top: 100, left: startingLeft, title: 'A1' },
-				A2: { top: 150, left: startingLeft, title: 'A2' },
-				C1: { top: 200, left: startingLeft, title: 'C1' },
-				C2: { top: 250, left: startingLeft, title: 'C2' }
-			}
+			roles: initialRoles
 		};
+
+		this.moveRole = this.moveRole.bind(this);
 	}
 
 	moveRole(id, left, top) {
@@ -75,21 +79,30 @@ class Court extends Component {
 		);
 	}
 
+	mapRoles() {
+        const { roles } = this.state;
+        return Object.keys(roles).map(key => {
+            const { left, top, title } = roles[key];
+            const { left: initialLeft, top: initialTop } = initialRoles[key];
+            const canReset = left !== initialLeft || top !== initialTop;
+
+            const resetPosition = () => this.moveRole(key, initialLeft, initialTop);
+
+            return (
+				<Role key={key} id={key} left={left} top={top} hideSourceOnDrag={true} canReset={canReset} resetPosition={resetPosition}>
+                    {title}
+				</Role>
+            );
+        });
+	}
+
 	render() {
-		const { hideSourceOnDrag, connectDropTarget } = this.props;
-		const { roles } = this.state;
+		const { connectDropTarget } = this.props;
 
 		return connectDropTarget(
 			<div style={courtStyles}>
 				<div style={frontRowStyles} />
-				{Object.keys(roles).map(key => {
-					const { left, top, title } = roles[key];
-					return (
-						<Role key={key} id={key} left={left} top={top} hideSourceOnDrag={true}>
-							{title}
-						</Role>
-					);
-				})}
+				{ this.mapRoles() }
 			</div>
 		);
 	}
