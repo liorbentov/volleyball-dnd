@@ -1,3 +1,3 @@
 export default {
-    ROLE: 'role',
+	ROLE: 'role'
 };
