@@ -5,6 +5,7 @@
   "dependencies": {
     "immutability-helper": "^2.6.4",
     "lodash.flow": "^3.5.0",
+    "lodash.some": "^4.6.0",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dnd": "^2.5.4",

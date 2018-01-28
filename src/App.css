@@ -1,4 +1,5 @@
 .App {
+  display: inline-block;
   text-align: center;
-  transform: translate(30%, 100px);
+  transform: translate(100%, 100px);
 }

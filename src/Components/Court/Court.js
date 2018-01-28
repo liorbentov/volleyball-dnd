@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import update from 'immutability-helper';
-import { DropTarget, DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import ItemTypes from '../ItemTypes';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 import Role from '../Role/Role';
 import flow from 'lodash.flow';
+import some from 'lodash.some';
+import update from 'immutability-helper';
+import { DropTarget, DragDropContext } from 'react-dnd';
 
 const width = 540;
 const frontRowHeight = width / 3;
@@ -15,9 +16,6 @@ const courtStyles = {
 	width: `${width}px`,
 	height: `${width}px`,
 	border: `${borderWidth} solid green`,
-	position: 'absolute',
-	top: 0,
-	left: 0
 };
 
 const frontRowStyles = {
@@ -25,9 +23,8 @@ const frontRowStyles = {
 	width: `${width}px`,
 	height: `${frontRowHeight}px`,
 	border: '3px solid green',
-	position: 'absolute',
-	top: `-${borderWidth}`,
-	left: `-${borderWidth}`
+	marginTop: `-${borderWidth}`,
+	marginLeft: `-${borderWidth}`
 };
 
 const roleTarget = {
@@ -65,6 +62,7 @@ class Court extends Component {
 		};
 
 		this.moveRole = this.moveRole.bind(this);
+		this.resetRoles = this.resetRoles.bind(this);
 	}
 
 	moveRole(id, left, top) {
@@ -96,15 +94,29 @@ class Court extends Component {
         });
 	}
 
+	canReset() {
+		const { roles } = this.state;
+		return some(Object.keys(roles), key => {
+            const { left, top  } = roles[key];
+            const { left: initialLeft, top: initialTop } = initialRoles[key];
+            return left !== initialLeft || top !== initialTop;
+        });
+	}
+
+	resetRoles() {
+		this.setState({ roles: initialRoles });
+	}
+
 	render() {
 		const { connectDropTarget } = this.props;
+		const canReset = this.canReset();
 
-		return connectDropTarget(
+		return [connectDropTarget(
 			<div style={courtStyles}>
 				<div style={frontRowStyles} />
 				{ this.mapRoles() }
 			</div>
-		);
+		), canReset && <button key="reset-all" onClick={this.resetRoles}>Reset All</button>];
 	}
 }
 
